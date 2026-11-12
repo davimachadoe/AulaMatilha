@@ -71,7 +71,13 @@ export class ParticleSystem {
         ctx.shadowBlur = p.size * 3;
       }
       const s = Math.max(0.1, p.size);
-      if (p.shape === 'rect') {
+      if (p.shape === 'ring') {
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(1, 6 * t);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (p.shape === 'rect') {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rot);

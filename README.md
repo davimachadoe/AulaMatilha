@@ -23,7 +23,7 @@ Atalhos de desenvolvimento pela URL:
 | Etapa | Conteúdo | Status |
 |---|---|---|
 | 1 | Estrutura, tela inicial, personagem básico, mapas e motor de renderização | ✅ Concluída |
-| 2 | Física, mira, vento, disparos e explosões | ⏳ Pendente |
+| 2 | Física, mira, vento, disparos e explosões | ✅ Concluída |
 | 3 | Terreno destrutível, movimentação, colisões e turnos | ⏳ Pendente |
 | 4 | Criação e personalização completa de personagens | ⏳ Pendente |
 | 5 | Armas, classes, habilidades e atributos | ⏳ Pendente |
@@ -41,6 +41,16 @@ Atalhos de desenvolvimento pela URL:
 - **Telas:** menu/lobby, seleção de mapa, personagem (prévia ao vivo, corpo masculino ou feminino, 11 opções de aparência com saias e penteados, nome) e configurações. As telas ainda não construídas mostram claramente em qual etapa entram.
 - **Salvamento:** camada assíncrona com adaptador de LocalStorage, versão e migração do save, recuperação de save corrompido. Pronta para trocar por um servidor.
 - **Áudio:** efeitos de interface sintetizados (Web Audio), com volume configurável.
+
+### O que funciona na Etapa 2 (Campo de treino)
+
+- **Controles:** `↑`/`↓` ângulo (`Shift` para ajuste fino), `←`/`→` virar, `Espaço` segurar para carregar e soltar para atirar, `T` alterna prévia completa/curta. No celular aparecem botões de toque.
+- **Física:** trajetória parabólica com gravidade, vento e peso da arma; colisão contínua com terreno e personagens. A prévia pontilhada usa exatamente o mesmo cálculo do tiro real.
+- **Vento:** muda a cada rodada, dentro da faixa de cada mapa; seta e número no topo da tela.
+- **Explosões:** cratera no terreno, dano com queda por distância (bônus em acerto direto), clarão, onda de choque, fogo, fumaça, pedaços de terreno, tremor de câmera e números de dano.
+- **Queda:** quem perde o chão cai; quem cai no mar/lava é eliminado. No treino, o boneco e o jogador voltam depois de um instante.
+- **HUD:** vento, ângulo, potência (com marca do último tiro), arma, vida sobre os personagens e estatísticas do treino.
+- **Dano preparado para a Etapa 5:** a fórmula já aceita ataque, defesa e multiplicadores, com retorno decrescente para o PvP não ficar injusto.
 
 ## Estrutura
 

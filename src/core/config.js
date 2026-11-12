@@ -20,8 +20,19 @@ export const TURN = {
 export const PHYSICS = {
   gravity: 900, // px/s²
   fixedDt: 1 / 60,
-  maxPower: 1000, // velocidade inicial máxima (px/s)
-  windMax: 120, // aceleração horizontal máxima do vento (px/s²)
+  maxPower: 1250, // velocidade inicial com 100% de potência (px/s)
+  windMax: 140, // aceleração horizontal com vento 10 (px/s²)
+  windScale: 10, // vento vai de -10 a +10
+  maxFlightTime: 15, // segundos até um projétil ser descartado
+  characterGravity: 1400, // queda de personagens
+};
+
+export const AIM = {
+  minAngle: -20,
+  maxAngle: 90,
+  angleSpeed: 40, // graus por segundo
+  fineAngleSpeed: 8, // segurando Shift
+  chargeTime: 1.6, // segundos de 0 a 100% de potência
 };
 
 export const CAMERA = {

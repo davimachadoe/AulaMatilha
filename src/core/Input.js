@@ -78,6 +78,17 @@ export class Input {
     );
   }
 
+  /** Teclas virtuais (botões de toque na tela) se comportam como teclas reais. */
+  setVirtual(code, isDown) {
+    if (isDown) {
+      if (!this.down.has(code)) this.pressed.add(code);
+      this.down.add(code);
+    } else if (this.down.has(code)) {
+      this.down.delete(code);
+      this.released.add(code);
+    }
+  }
+
   isDown(...codes) {
     return codes.some((c) => this.down.has(c));
   }

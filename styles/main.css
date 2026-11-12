@@ -517,6 +517,204 @@ kbd {
   font-size: 0.8rem;
   background: rgba(255, 225, 168, 0.95);
 }
+.hud > .pending-note {
+  position: absolute;
+  top: 66px;
+  left: 12px;
+  max-width: calc(100% - 24px);
+}
+
+/* vento */
+.wind-box {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 14px 6px;
+}
+.wind-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.wind-arrow {
+  position: relative;
+  display: block;
+  width: 120px;
+  height: 14px;
+  background: #e9dfe6;
+  border: 2px solid var(--ink);
+  border-radius: 7px;
+  overflow: visible;
+}
+.wind-fill {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  max-width: 50%;
+  background: linear-gradient(90deg, #7fd3ff, #3f86e8);
+  border-radius: 0 6px 6px 0;
+  transform-origin: left center;
+  transition: width 0.3s;
+}
+.wind-fill::after {
+  content: '';
+  position: absolute;
+  right: -9px;
+  top: -5px;
+  border: 10px solid transparent;
+  border-left: 10px solid var(--ink);
+  border-right: none;
+}
+.wind-arrow.left .wind-fill {
+  transform: scaleX(-1);
+}
+.wind-arrow.calm .wind-fill::after {
+  display: none;
+}
+.wind-value {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* painel de tiro */
+.shot-panel {
+  align-items: center;
+  gap: 16px;
+  padding: 8px 14px;
+}
+.weapon-slot {
+  font-weight: 600;
+  font-size: 0.85rem;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+.weapon-slot.active {
+  background: var(--primary);
+}
+.angle-box,
+.power-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.angle-value {
+  font-size: 1.5rem;
+  line-height: 1;
+  min-width: 3ch;
+}
+.power-bar {
+  position: relative;
+  width: 200px;
+  height: 18px;
+  background: #e9dfe6;
+  border: 3px solid var(--ink);
+  border-radius: 9px;
+  overflow: hidden;
+}
+.power-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7be06b, #ffd23f 60%, #ff5a2a);
+  background-size: 200px 100%;
+}
+.power-bar.charging {
+  box-shadow: 0 0 0 3px rgba(255, 183, 43, 0.6);
+}
+.power-last {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1.5px;
+  background: var(--ink);
+}
+.stats {
+  gap: 12px;
+}
+.hud.busy .shot-panel {
+  opacity: 0.6;
+}
+
+/* avisos */
+.hud-banner {
+  position: absolute;
+  top: 24%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 3px 0 var(--ink), 2px 2px 0 var(--ink), -2px 2px 0 var(--ink), 2px -2px 0 var(--ink), -2px -2px 0 var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.hud-banner.pop {
+  animation: banner-pop 0.35s ease-out;
+}
+.banner-good {
+  color: #ffd23f;
+}
+.banner-bad {
+  color: #ff8f8f;
+}
+.banner-warn {
+  color: #ffe1a8;
+}
+@keyframes banner-pop {
+  from {
+    transform: translateX(-50%) scale(1.6);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* controles de toque */
+.touch-controls {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 96px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.touch-controls[hidden] {
+  display: none;
+}
+.touch-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.touch-row {
+  display: flex;
+  gap: 44px;
+}
+.touch-btn {
+  width: 54px;
+  height: 54px;
+  justify-content: center;
+  font-size: 1.2rem;
+  pointer-events: auto;
+  touch-action: none;
+}
+.touch-fire {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  justify-content: center;
+  font-size: 1.1rem;
+  pointer-events: auto;
+  touch-action: none;
+}
 
 /* ---------- avisos e erros ---------- */
 
@@ -608,7 +806,26 @@ kbd {
   .option-rows {
     grid-template-columns: 1fr;
   }
-  .help {
+  .help,
+  .stats,
+  .hud > .pending-note {
     display: none;
+  }
+  .hud-top {
+    flex-direction: column;
+  }
+  .hud-actions .btn {
+    padding: 0.3em 0.5em;
+  }
+  .shot-panel {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .weapon-slots {
+    display: none;
+  }
+  .power-bar {
+    width: 140px;
   }
 }

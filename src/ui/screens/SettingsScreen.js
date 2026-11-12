@@ -30,6 +30,10 @@ export class SettingsScreen {
             <span>Partículas e clima (desligue em aparelhos lentos)</span>
           </label>
           <label class="field check">
+            <input type="checkbox" data-setting="screenShake" ${s.screenShake ? 'checked' : ''} />
+            <span>Tremor de câmera nas explosões</span>
+          </label>
+          <label class="field check">
             <input type="checkbox" data-setting="showFps" ${s.showFps ? 'checked' : ''} />
             <span>Mostrar FPS na batalha</span>
           </label>
