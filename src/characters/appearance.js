@@ -2,6 +2,10 @@
 // Na Etapa 4 cada opção vira um item com raridade/desbloqueio; os ids continuam os mesmos.
 
 export const APPEARANCE_OPTIONS = {
+  body: [
+    { id: 'male', label: 'Masculino' },
+    { id: 'female', label: 'Feminino' },
+  ],
   skin: [
     { id: 'porcelain', label: 'Porcelana', color: '#ffe3cc' },
     { id: 'peach', label: 'Pêssego', color: '#f8c9a2' },
@@ -17,6 +21,8 @@ export const APPEARANCE_OPTIONS = {
     { id: 'bob', label: 'Chanel' },
     { id: 'quiff', label: 'Topete' },
     { id: 'buzz', label: 'Raspado' },
+    { id: 'ponytail', label: 'Rabo de cavalo' },
+    { id: 'pigtails', label: 'Maria-chiquinha' },
   ],
   hairColor: [
     { id: 'black', label: 'Preto', color: '#2a2230' },
@@ -55,10 +61,13 @@ export const APPEARANCE_OPTIONS = {
     { id: 'vest-orange', label: 'Colete Laranja', color: '#f08a2f', style: 'vest' },
   ],
   bottom: [
-    { id: 'jeans', label: 'Jeans', color: '#3d5a8f' },
-    { id: 'khaki', label: 'Cáqui', color: '#b99a62' },
-    { id: 'black', label: 'Preta', color: '#2e2b38' },
-    { id: 'red', label: 'Vermelha', color: '#b83a3a' },
+    { id: 'jeans', label: 'Calça Jeans', color: '#3d5a8f', style: 'pants' },
+    { id: 'khaki', label: 'Calça Cáqui', color: '#b99a62', style: 'pants' },
+    { id: 'black', label: 'Calça Preta', color: '#2e2b38', style: 'pants' },
+    { id: 'red', label: 'Calça Vermelha', color: '#b83a3a', style: 'pants' },
+    { id: 'skirt-pink', label: 'Saia Rosa', color: '#ff7eb6', style: 'skirt' },
+    { id: 'skirt-blue', label: 'Saia Azul', color: '#3f7fe8', style: 'skirt' },
+    { id: 'skirt-plaid', label: 'Saia Xadrez', color: '#c0392b', style: 'skirt', pattern: true },
   ],
   boots: [
     { id: 'brown', label: 'Marrons', color: '#6a4026' },
@@ -76,6 +85,7 @@ export const APPEARANCE_OPTIONS = {
 
 /** Ordem e rótulos dos campos editáveis (usado pela tela de personagem). */
 export const APPEARANCE_FIELDS = [
+  ['body', 'Corpo'],
   ['skin', 'Pele'],
   ['hairStyle', 'Cabelo'],
   ['hairColor', 'Cor do cabelo'],
@@ -83,13 +93,14 @@ export const APPEARANCE_FIELDS = [
   ['eyeColor', 'Cor dos olhos'],
   ['mouth', 'Boca'],
   ['top', 'Roupa'],
-  ['bottom', 'Calça'],
+  ['bottom', 'Parte de baixo'],
   ['boots', 'Botas'],
   ['headwear', 'Cabeça'],
 ];
 
 export function defaultAppearance() {
   return {
+    body: 'male',
     skin: 'peach',
     hairStyle: 'spiky',
     hairColor: 'brown',

@@ -54,7 +54,9 @@ export function registerLayer(layer, beforeId = null) {
 /** Resolve ids de aparência em cores/estilos prontos para desenhar. */
 export function resolveLook(appearance) {
   const top = getOption('top', appearance.top);
+  const bottom = getOption('bottom', appearance.bottom);
   return {
+    female: appearance.body === 'female',
     skin: getOption('skin', appearance.skin).color,
     hair: getOption('hairColor', appearance.hairColor).color,
     hairStyle: appearance.hairStyle,
@@ -63,7 +65,9 @@ export function resolveLook(appearance) {
     mouth: appearance.mouth,
     top: top.color,
     topStyle: top.style,
-    bottom: getOption('bottom', appearance.bottom).color,
+    bottom: bottom.color,
+    bottomStyle: bottom.style,
+    bottomPattern: Boolean(bottom.pattern),
     boots: getOption('boots', appearance.boots).color,
     headwear: appearance.headwear,
   };
@@ -108,10 +112,34 @@ function drawBackAccessory() {
 }
 
 function drawHairBack(ctx, look, p) {
-  if (look.hairStyle !== 'long' && look.hairStyle !== 'bob') return;
   const y = HEAD_Y + p.bob;
+  const back = darken(look.hair, 0.12);
+  const sway = Math.sin((p.time ?? 0) * 3) * 1.5;
+  if (look.hairStyle === 'ponytail') {
+    fs(ctx, back, () => {
+      ctx.moveTo(-10, y - 12);
+      ctx.quadraticCurveTo(-30, y - 6 + sway, -24 + sway, y + 22);
+      ctx.quadraticCurveTo(-20, y + 8, -12, y - 2);
+      ctx.closePath();
+    });
+    fs(ctx, '#ff7eb6', () => ctx.ellipse(-12, y - 8, 3, 4.5, 0.4, 0, Math.PI * 2), 1.6);
+    return;
+  }
+  if (look.hairStyle === 'pigtails') {
+    for (const [x, dir, reach] of [[-15, -1, 12], [14, 1, 17]]) {
+      fs(ctx, back, () => {
+        ctx.moveTo(x, y - 4);
+        ctx.quadraticCurveTo(x + dir * reach, y + 2 + sway, x + dir * (reach - 5) + sway * 0.5, y + 20);
+        ctx.quadraticCurveTo(x + dir * 1, y + 10, x - dir * 2, y + 2);
+        ctx.closePath();
+      });
+      fs(ctx, '#ff7eb6', () => ctx.arc(x + dir * 1, y - 3, 3, 0, Math.PI * 2), 1.6);
+    }
+    return;
+  }
+  if (look.hairStyle !== 'long' && look.hairStyle !== 'bob') return;
   const len = look.hairStyle === 'long' ? 30 : 14;
-  fs(ctx, darken(look.hair, 0.12), () => {
+  fs(ctx, back, () => {
     ctx.moveTo(-HEAD_R + 1, y - 2);
     ctx.quadraticCurveTo(-HEAD_R - 4, y + len * 0.6, -HEAD_R + 2, y + len);
     ctx.lineTo(HEAD_R - 6, y + len - 2);
@@ -128,15 +156,62 @@ function drawBackArm(ctx, look, p) {
 
 function drawLegs(ctx, look, p) {
   const walk = p.state === 'walk' ? Math.sin((p.time ?? 0) * 12) * 3 : 0;
+  const skirt = look.bottomStyle === 'skirt';
   for (const [x, off] of [[-5, walk], [4, -walk]]) {
-    fs(ctx, look.bottom, () => ctx.roundRect(x - 3.5 + off * 0.3, -15, 7.5, 12, 3));
+    // Com saia, as pernas aparecem (meia-calça escura por baixo).
+    const legColor = skirt ? '#3a3448' : look.bottom;
+    fs(ctx, legColor, () => ctx.roundRect(x - 3 + off * 0.3, -15, 6.5, 12, 3));
     fs(ctx, look.boots, () => ctx.roundRect(x - 4 + off * 0.3, -6, 10.5, 6.5, [3, 4, 2, 2]));
+  }
+  if (skirt) {
+    const y = -16 + p.bob * 0.5;
+    const flare = Math.sin((p.time ?? 0) * 2.6) * 0.6;
+    fs(ctx, look.bottom, () => {
+      ctx.moveTo(-10, y);
+      ctx.lineTo(10, y);
+      ctx.lineTo(13 + flare, y + 9);
+      ctx.quadraticCurveTo(0, y + 11.5, -13 - flare, y + 9);
+      ctx.closePath();
+    });
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = look.bottomPattern ? 'rgba(255,230,160,0.85)' : 'rgba(43,29,46,0.45)';
+    ctx.beginPath();
+    if (look.bottomPattern) {
+      // Xadrez: linhas cruzadas.
+      ctx.moveTo(-11, y + 4.5);
+      ctx.lineTo(11, y + 4.5);
+      for (const px of [-6, 0, 6]) {
+        ctx.moveTo(px, y + 1);
+        ctx.lineTo(px * 1.25, y + 9.5);
+      }
+    } else {
+      // Pregas da saia.
+      for (const px of [-5, 0, 5]) {
+        ctx.moveTo(px, y + 2);
+        ctx.lineTo(px * 1.3, y + 9.5);
+      }
+    }
+    ctx.stroke();
   }
 }
 
 function drawTorso(ctx, look, p) {
   const y = -31 + p.bob;
-  fs(ctx, look.top, () => ctx.roundRect(-10, y, 20, 19, 6));
+  if (look.female) {
+    // Silhueta feminina: ombros arredondados e cintura mais fina.
+    fs(ctx, look.top, () => {
+      ctx.moveTo(-6, y);
+      ctx.lineTo(6, y);
+      ctx.quadraticCurveTo(10.5, y + 1, 10, y + 6);
+      ctx.quadraticCurveTo(7, y + 12, 8.5, y + 19);
+      ctx.lineTo(-8.5, y + 19);
+      ctx.quadraticCurveTo(-7, y + 12, -10, y + 6);
+      ctx.quadraticCurveTo(-10.5, y + 1, -6, y);
+      ctx.closePath();
+    });
+  } else {
+    fs(ctx, look.top, () => ctx.roundRect(-10, y, 20, 19, 6));
+  }
   ctx.lineWidth = 1.6;
   ctx.strokeStyle = OUTLINE;
   if (look.topStyle === 'jacket') {
@@ -160,8 +235,9 @@ function drawTorso(ctx, look, p) {
     ctx.arc(2, y + 9, 3.2, 0, Math.PI * 2);
     ctx.fill();
   }
-  // Cinto.
-  fs(ctx, '#3a2a22', () => ctx.rect(-10, y + 15, 20, 4), 1.4);
+  // Cinto (mais fino no corpo feminino, acompanhando a cintura).
+  const bw = look.female ? 8.5 : 10;
+  fs(ctx, '#3a2a22', () => ctx.rect(-bw, y + 15, bw * 2, 4), 1.4);
   ctx.fillStyle = '#f5c542';
   ctx.fillRect(1, y + 15.5, 4, 3);
 }
@@ -221,6 +297,17 @@ function drawFace(ctx, look, p) {
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.fillRect(ex + lookX - 1.4, ey + lookY * 0.5 - 1.8, 1.2, 1.2);
+    if (look.female && look.eyes !== 'sleepy') {
+      // Cílios no canto externo do olho.
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(ex + 1.5, ey - h + 0.6);
+      ctx.lineTo(ex + 3.6, ey - h - 1.2);
+      ctx.moveTo(ex + 2.6, ey - h + 1.6);
+      ctx.lineTo(ex + 4.8, ey - h + 0.4);
+      ctx.stroke();
+    }
     if (look.eyes === 'sleepy') {
       ctx.fillStyle = look.skin;
       ctx.fillRect(ex - 3.5, ey - h - 1, 7, h * 0.9);
@@ -311,16 +398,20 @@ function drawHairFront(ctx, look, p) {
       break;
     case 'long':
     case 'bob':
+    case 'ponytail':
+    case 'pigtails': {
+      const side = { long: 16, bob: 8 }[look.hairStyle] ?? 2;
       fs(ctx, c, () => {
-        ctx.moveTo(-r - 1, y + (look.hairStyle === 'long' ? 16 : 8));
+        ctx.moveTo(-r - 1, y + side);
         ctx.quadraticCurveTo(-r - 3, y - r - 4, 2, y - r - 3);
         ctx.quadraticCurveTo(r + 3, y - r, r + 1, y - 3);
         ctx.quadraticCurveTo(8, y - 9, 4, y - 4);
         ctx.quadraticCurveTo(-2, y - 8, -6, y - 3);
-        ctx.quadraticCurveTo(-9, y + 2, -10, y + 6);
+        ctx.quadraticCurveTo(-9, y + 2, -10, y + Math.min(6, side));
         ctx.closePath();
       });
       break;
+    }
     case 'quiff':
       fs(ctx, c, () => {
         ctx.moveTo(-r, y + 1);

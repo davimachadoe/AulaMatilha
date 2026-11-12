@@ -38,7 +38,7 @@ Atalhos de desenvolvimento pela URL:
 - **Terreno:** máscara de pixels pronta para destruição (`carveCircle`), gerada proceduralmente como ilhas flutuantes (mesma semente = mesmo mapa).
 - **5 mapas:** Ilha Tropical, Vale Vulcânico, Floresta Mística, Deserto Perdido e Montanhas Congeladas, cada um com paleta, fundo em parallax, decoração, fluido animado e clima próprios.
 - **Personagem por camadas:** 10 camadas independentes (cabelo de trás, corpo, rosto, cabelo da frente, chapéu, braço com arma...), com animações de espera, piscar, vitória e derrota.
-- **Telas:** menu/lobby, seleção de mapa, personagem (prévia ao vivo, 10 opções de aparência, nome) e configurações. As telas ainda não construídas mostram claramente em qual etapa entram.
+- **Telas:** menu/lobby, seleção de mapa, personagem (prévia ao vivo, corpo masculino ou feminino, 11 opções de aparência com saias e penteados, nome) e configurações. As telas ainda não construídas mostram claramente em qual etapa entram.
 - **Salvamento:** camada assíncrona com adaptador de LocalStorage, versão e migração do save, recuperação de save corrompido. Pronta para trocar por um servidor.
 - **Áudio:** efeitos de interface sintetizados (Web Audio), com volume configurável.
 
