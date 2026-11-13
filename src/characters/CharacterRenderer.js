@@ -4,6 +4,7 @@
 
 import { getOption } from './appearance.js';
 import { degToRad } from '../core/math.js';
+import { SPRITE_MODELS, getSpriteImage, loadSprite } from './spriteModels.js';
 
 const OUTLINE = '#2b1d2e';
 const HEAD_Y = -46;
@@ -55,7 +56,11 @@ export function registerLayer(layer, beforeId = null) {
 export function resolveLook(appearance) {
   const top = getOption('top', appearance.top);
   const bottom = getOption('bottom', appearance.bottom);
+  const sprite = SPRITE_MODELS[appearance.model] ? appearance.model : null;
+  if (sprite) loadSprite(sprite);
   return {
+    sprite,
+    tagHeight: sprite ? SPRITE_MODELS[sprite].height + 10 : 74,
     female: appearance.body === 'female',
     skin: getOption('skin', appearance.skin).color,
     hair: getOption('hairColor', appearance.hairColor).color,
@@ -79,6 +84,12 @@ export function resolveLook(appearance) {
  * @param {object} pose   { x, y, facing (1|-1), aim (graus), time, blink (0..1), state, scale }
  */
 export function drawCharacter(ctx, look, pose) {
+  // Modelo ilustrado: usa a imagem (se ainda estiver carregando, mostra o boneco desenhado).
+  const img = look.sprite ? getSpriteImage(look.sprite) : null;
+  if (img) {
+    drawSpriteCharacter(ctx, look, pose, img);
+    return;
+  }
   ctx.save();
   ctx.translate(pose.x, pose.y);
   const s = pose.scale ?? 1;
@@ -506,17 +517,78 @@ function drawHeadwear(ctx, look, p) {
 }
 
 function drawWeaponArm(ctx, look, p) {
-  // Braço da frente segurando a arma, girado pelo ângulo de mira.
-  const sx = 3;
-  const sy = -25 + p.bob;
+  drawCannonArm(ctx, look.top, look.skin, p.aimRad, p.bob);
+}
+
+/** Braço da frente segurando o canhão, girado pelo ângulo de mira (ombro em 3, -25). */
+function drawCannonArm(ctx, sleeve, hand, aimRad, bob) {
   ctx.save();
-  ctx.translate(sx, sy);
-  ctx.rotate(-p.aimRad);
+  ctx.translate(3, -25 + bob);
+  ctx.rotate(-aimRad);
   // Canhão básico (a Etapa 5 troca o desenho conforme a arma equipada).
   fs(ctx, '#56606e', () => ctx.roundRect(2, -5, 26, 10, 4));
   fs(ctx, '#3c434e', () => ctx.roundRect(24, -6.5, 7, 13, 2.5));
   fs(ctx, '#f5c542', () => ctx.rect(10, -5, 4, 10), 1.4);
-  fs(ctx, look.top, () => ctx.roundRect(-3, -4, 11, 8, 4));
-  fs(ctx, look.skin, () => ctx.arc(10, 4, 3.8, 0, Math.PI * 2));
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.fillRect(5, -3.5, 18, 1.6);
+  fs(ctx, sleeve, () => ctx.roundRect(-3, -4, 11, 8, 4));
+  fs(ctx, hand, () => ctx.arc(10, 4, 3.8, 0, Math.PI * 2));
+  ctx.restore();
+}
+
+// ----------------------------------------------------------------- modelo ilustrado
+
+/** Personagem a partir de uma ilustração, animado por deformação (respirar, pular, inclinar). */
+function drawSpriteCharacter(ctx, look, pose, img) {
+  const model = SPRITE_MODELS[look.sprite];
+  const t = pose.time ?? 0;
+  const state = pose.state ?? 'idle';
+  const s = pose.scale ?? 1;
+  const breathe = Math.sin(t * 2.6);
+
+  let hop = 0;
+  let tilt = Math.sin(t * 1.3) * 0.02;
+  let sx = 1 - breathe * 0.01;
+  let sy = 1 + breathe * 0.018;
+  if (state === 'victory') {
+    const ph = Math.abs(Math.sin(t * 6));
+    hop = -ph * 10;
+    // Achata ao tocar o chão, estica no ar.
+    sy = ph < 0.25 ? 0.92 : 1.04;
+    sx = ph < 0.25 ? 1.06 : 0.97;
+  } else if (state === 'defeat') {
+    tilt = -0.14;
+    sy = 0.96;
+  } else if (state === 'walk') {
+    hop = -Math.abs(Math.sin(t * 12)) * 2.5;
+    tilt = Math.sin(t * 12) * 0.05;
+  }
+
+  ctx.save();
+  ctx.translate(pose.x, pose.y);
+  ctx.scale(s * (pose.facing < 0 ? -1 : 1), s);
+
+  // Sombra no chão (diminui quando pula).
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  ctx.beginPath();
+  ctx.ellipse(0, 1, 17 * (1 + hop / 40), 4, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.translate(0, hop);
+  ctx.rotate(tilt);
+  ctx.scale(sx, sy);
+  const h = model.height;
+  const w = (h * img.width) / img.height;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, -w / 2, -h, w, h);
+  ctx.restore();
+
+  // Canhão por cima (mesmo ponto de saída do tiro que o boneco desenhado).
+  ctx.save();
+  ctx.translate(pose.x, pose.y + hop * s);
+  ctx.scale(s * (pose.facing < 0 ? -1 : 1), s);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  drawCannonArm(ctx, model.sleeve, model.hand, degToRad(pose.aim ?? 30), breathe * 0.8);
   ctx.restore();
 }

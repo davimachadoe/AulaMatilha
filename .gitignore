@@ -4,3 +4,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 .env
+
+# Arte de terceiros com licença que proíbe redistribuir os arquivos (ex.: CraftPix)
+assets/vendor/

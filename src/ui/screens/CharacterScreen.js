@@ -53,6 +53,7 @@ export class CharacterScreen {
                   </div>`,
                 ).join('')}
               </div>
+              <p class="muted small sprite-note" hidden>O modelo ilustrado tem visual fixo: as outras opções valem para o modelo Desenhado.</p>
               <p class="muted small">Itens com raridade, roupas especiais, asas e mascotes: Etapa 4.</p>
               <div class="actions">
                 <button class="btn" data-action="random">🎲 Aleatório</button>
@@ -81,7 +82,7 @@ export class CharacterScreen {
         this._applyAppearance();
       },
       random: () => {
-        this.appearance = randomAppearance();
+        this.appearance = { ...randomAppearance(), model: this.appearance.model };
         this._applyAppearance();
       },
       pose: (btn) => {
@@ -107,6 +108,13 @@ export class CharacterScreen {
   }
 
   _refreshLabels() {
+    // Com modelo ilustrado, as peças do boneco desenhado ficam esmaecidas.
+    const illustrated = this.appearance.model !== 'drawn';
+    this.el.querySelector('.sprite-note').hidden = !illustrated;
+    this.el.querySelectorAll('.option-row').forEach((row) => {
+      const field = row.querySelector('[data-field]').dataset.field;
+      row.classList.toggle('dimmed', illustrated && field !== 'model');
+    });
     for (const [field] of APPEARANCE_FIELDS) {
       const opt = getOption(field, this.appearance[field]);
       const span = this.el.querySelector(`[data-value="${field}"]`);

@@ -423,6 +423,9 @@ hr {
   align-items: center;
   gap: 6px;
 }
+.option-row.dimmed {
+  opacity: 0.4;
+}
 .option-label {
   font-weight: 600;
   font-size: 0.9rem;

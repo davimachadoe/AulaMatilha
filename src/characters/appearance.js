@@ -2,6 +2,11 @@
 // Na Etapa 4 cada opção vira um item com raridade/desbloqueio; os ids continuam os mesmos.
 
 export const APPEARANCE_OPTIONS = {
+  // "Desenhado" = boneco montado por camadas; os outros são ilustrações (src/characters/spriteModels.js).
+  model: [
+    { id: 'drawn', label: 'Desenhado (personalizável)' },
+    { id: 'goggles-boy', label: 'Ilustrado: Herói dos Óculos' },
+  ],
   body: [
     { id: 'male', label: 'Masculino' },
     { id: 'female', label: 'Feminino' },
@@ -85,6 +90,7 @@ export const APPEARANCE_OPTIONS = {
 
 /** Ordem e rótulos dos campos editáveis (usado pela tela de personagem). */
 export const APPEARANCE_FIELDS = [
+  ['model', 'Modelo'],
   ['body', 'Corpo'],
   ['skin', 'Pele'],
   ['hairStyle', 'Cabelo'],
@@ -100,6 +106,7 @@ export const APPEARANCE_FIELDS = [
 
 export function defaultAppearance() {
   return {
+    model: 'drawn',
     body: 'male',
     skin: 'peach',
     hairStyle: 'spiky',
@@ -127,8 +134,10 @@ export function validateAppearance(a) {
 }
 
 export function randomAppearance(rng = Math.random) {
-  const out = {};
+  // Sorteia as peças do boneco desenhado; o modelo continua "desenhado".
+  const out = { model: 'drawn' };
   for (const key of Object.keys(APPEARANCE_OPTIONS)) {
+    if (key === 'model') continue;
     const opts = APPEARANCE_OPTIONS[key];
     out[key] = opts[Math.floor(rng() * opts.length)].id;
   }

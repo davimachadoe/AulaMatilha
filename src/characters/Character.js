@@ -85,7 +85,7 @@ export class Character {
     });
     ctx.globalAlpha = 1;
 
-    let ty = this.y - 74 * scale;
+    let ty = this.y - (this.look.tagHeight ?? 74) * scale;
     if (showHp) {
       const w = 46;
       const h = 7;
